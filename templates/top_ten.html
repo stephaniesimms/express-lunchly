@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Top Ten Customers{% endblock %}
+{% block content %}
+
+<h1>MealPal Pals</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Total Reservations</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(0, CUTOFF) -%}
+        <tr>
+            <th scope="row">{{ i+1 }}</th>
+            <td><a href="/{{ topCustomers[i].id }}/">{{ topCustomers[i].fullName }}</a></td>
+            <td>{{ topReservationCounts[i] }}</td>
+        </tr>
+        {%- endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}

@@ -59,6 +59,12 @@ class Customer {
     return await Reservation.getReservationsForCustomer(this.id);
   }
 
+  /** get the full name for this customer*/
+
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
   /** save this customer. */
 
   async save() {
@@ -77,6 +83,90 @@ class Customer {
         [this.firstName, this.lastName, this.phone, this.notes, this.id]
       );
     }
+  }
+
+  /** search for customers by search terms and return array of customers */
+
+  static async search(name) {
+    if (name.trim() === ""){
+      throw new Error("Please enter a name.")
+    }
+
+    let searchTerms = name.trim().split(' ');
+    if (searchTerms.length === 2) {
+
+      let searchFirst = `%${searchTerms[0]}%`;
+      let searchLast = `%${searchTerms[1]}%`
+
+      const results = await db.query(
+        `SELECT id, 
+           first_name AS "firstName",  
+           last_name AS "lastName", 
+           phone, 
+           notes
+         FROM customers
+         WHERE (first_name ILIKE $1 AND last_name ILIKE $2)
+         OR (first_name ILIKE $2 AND last_name ILIKE $1)
+         ORDER BY last_name, first_name`,
+        [searchFirst, searchLast]
+      );
+      return results.rows.map(c => new Customer(c));
+    }
+
+    else if (searchTerms.length === 1) {
+      let searchTerm = `%${searchTerms[0]}%`;
+
+      const results = await db.query(
+        `SELECT id, 
+           first_name AS "firstName",  
+           last_name AS "lastName", 
+           phone, 
+           notes
+         FROM customers
+         WHERE first_name ILIKE $1 OR last_name ILIKE $1
+         ORDER BY last_name, first_name`,
+        [searchTerm]
+      );
+      return results.rows.map(c => new Customer(c));
+    }
+
+    else{
+      throw new Error('Please enter one or two search terms.')
+    }
+  }
+
+  /** order and select top customers by total reservations */
+
+  static async getTopCustomers(n) {
+    const results = await db.query(
+      `SELECT customers.id,
+        first_name AS "firstName",
+        last_name AS "lastName",
+        phone,
+        customers.notes
+      FROM customers
+      JOIN reservations ON reservations.customer_id=customers.id
+      GROUP BY customers.id
+      ORDER BY COUNT(reservations.id) DESC
+      LIMIT $1`,
+      [n]
+    );
+    return results.rows.map(c => new Customer(c));
+  }
+
+  //** get top reservation counts */
+
+  static async getTopReservations(n){
+    const results = await db.query(
+      `SELECT COUNT(reservations.id)
+      FROM customers
+      JOIN reservations ON reservations.customer_id = customers.id
+      GROUP BY customers.id
+      ORDER BY COUNT(reservations.id) DESC
+      LIMIT $1`,
+      [n]
+    );
+    return results.rows.map(c => c.count)
   }
 }
 
