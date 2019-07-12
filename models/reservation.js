@@ -16,6 +16,17 @@ class Reservation {
     this.notes = notes;
   }
 
+  set numGuests(val){
+    if (val < 1){
+      throw new Error("WTF");
+    }
+    this._numGuests = val;
+  };
+
+  get numGuests(){
+    return this._numGuests;
+  }
+
   /** formatter for startAt */
 
   getFormattedStartAt() {
@@ -35,7 +46,6 @@ class Reservation {
          WHERE customer_id = $1`,
         [customerId]
     );
-
     return results.rows.map(row => new Reservation(row));
   }
 
@@ -58,9 +68,9 @@ class Reservation {
       );
     }
   }
+
 }
 
-  /** save this customer. */
 
 
 module.exports = Reservation;

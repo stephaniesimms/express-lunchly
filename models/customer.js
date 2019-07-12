@@ -88,7 +88,7 @@ class Customer {
   /** search for customers by search terms and return array of customers */
 
   static async search(name) {
-    if (name.trim() === ""){
+    if (name.trim() === "") {
       throw new Error("Please enter a name.");
     }
 
@@ -110,6 +110,9 @@ class Customer {
          ORDER BY last_name, first_name`,
         [searchFirst, searchLast]
       );
+      if (results.rows.length === 0) {
+        throw new Error("Customer not found.")
+      }
       return results.rows.map(c => new Customer(c));
     }
 
@@ -127,10 +130,13 @@ class Customer {
          ORDER BY last_name, first_name`,
         [searchTerm]
       );
+      if (results.rows.length === 0) {
+        throw new Error("Customer not found.")
+      }
       return results.rows.map(c => new Customer(c));
     }
 
-    else{
+    else {
       throw new Error('Please enter one or two search terms.');
     }
   }
@@ -156,7 +162,7 @@ class Customer {
 
   //** get top reservation counts */
 
-  static async getTopReservations(n){
+  static async getTopReservations(n) {
     const results = await db.query(
       `SELECT COUNT(reservations.id)
       FROM customers
@@ -169,5 +175,4 @@ class Customer {
     return results.rows.map(c => c.count);
   }
 }
-
 module.exports = Customer;

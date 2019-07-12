@@ -19,7 +19,7 @@ app.use(routes);
 
 /** 404 handler */
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   const err = new Error("Not Found");
   err.status = 404;
 
