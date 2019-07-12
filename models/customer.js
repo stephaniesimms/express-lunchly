@@ -89,14 +89,14 @@ class Customer {
 
   static async search(name) {
     if (name.trim() === ""){
-      throw new Error("Please enter a name.")
+      throw new Error("Please enter a name.");
     }
 
     let searchTerms = name.trim().split(' ');
     if (searchTerms.length === 2) {
 
       let searchFirst = `%${searchTerms[0]}%`;
-      let searchLast = `%${searchTerms[1]}%`
+      let searchLast = `%${searchTerms[1]}%`;
 
       const results = await db.query(
         `SELECT id, 
@@ -131,7 +131,7 @@ class Customer {
     }
 
     else{
-      throw new Error('Please enter one or two search terms.')
+      throw new Error('Please enter one or two search terms.');
     }
   }
 
@@ -166,7 +166,7 @@ class Customer {
       LIMIT $1`,
       [n]
     );
-    return results.rows.map(c => c.count)
+    return results.rows.map(c => c.count);
   }
 }
 
